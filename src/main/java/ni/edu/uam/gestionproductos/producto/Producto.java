@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import ni.edu.uam.gestionproductos.categoria.Categoria;
+import ni.edu.uam.gestionproductos.proveedor.Proveedor;
 
 import java.math.BigDecimal;
 
@@ -44,6 +45,10 @@ public class Producto {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "proveedor_id")
+    private Proveedor proveedor;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = true)
@@ -96,6 +101,14 @@ public class Producto {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public Proveedor getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(Proveedor proveedor) {
+        this.proveedor = proveedor;
     }
 
     public BigDecimal getPrecioVenta() {
