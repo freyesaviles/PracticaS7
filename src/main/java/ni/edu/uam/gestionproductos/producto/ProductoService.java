@@ -25,6 +25,12 @@ public class ProductoService {
 
     public Producto guardar(Producto producto) {
         Integer categoriaId = producto.getCategoria().getId();
+        if (categoriaId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La categoría debe incluir un ID válido");
+        }
+
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -34,6 +40,12 @@ public class ProductoService {
 
         if (producto.getProveedor() != null) {
             Integer proveedorId = producto.getProveedor().getId();
+            if (proveedorId == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "El proveedor debe incluir un ID válido");
+            }
+
             Proveedor proveedor = proveedorRepository.findById(proveedorId)
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND,
