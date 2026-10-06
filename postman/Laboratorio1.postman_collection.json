@@ -1,0 +1,488 @@
+{
+  "info": {
+    "_postman_id": "5d22c4a0-8b33-4a6f-9f5a-7f4f0b1c1a01",
+    "name": "Lab1 - Gestión de productos",
+    "description": "Colección para demostrar el Laboratorio 1: CRUD de productos, consultas por relación, migración V4 y relación Producto-Etiqueta.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "categoriaId",
+      "value": ""
+    },
+    {
+      "key": "proveedorId",
+      "value": ""
+    },
+    {
+      "key": "productoId",
+      "value": ""
+    },
+    {
+      "key": "etiquetaOfertaId",
+      "value": ""
+    },
+    {
+      "key": "etiquetaImportadoId",
+      "value": ""
+    },
+    {
+      "key": "etiquetaEmpresarialId",
+      "value": ""
+    },
+    {
+      "key": "etiquetaPortatilId",
+      "value": ""
+    },
+    {
+      "key": "etiquetaGamingId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Datos base",
+      "item": [
+        {
+          "name": "Crear categoría",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('sufijo', Date.now());",
+                  "pm.collectionVariables.set('categoriaNombre', 'Lab1 Computadoras ' + pm.collectionVariables.get('sufijo'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('La categoría fue creada', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('categoriaId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{categoriaNombre}}\",\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/categorias"
+          }
+        },
+        {
+          "name": "Crear proveedor",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('proveedorNombre', 'Lab1 Proveedor ' + pm.collectionVariables.get('sufijo'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('El proveedor fue creado', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('proveedorId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{proveedorNombre}}\",\n  \"telefono\": \"2255-0101\",\n  \"correo\": \"lab1-{{sufijo}}@example.com\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/proveedores"
+          }
+        },
+        {
+          "name": "Consultar categorías",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categorias"
+          }
+        },
+        {
+          "name": "Consultar proveedores",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/proveedores"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. CRUD de productos",
+      "item": [
+        {
+          "name": "Crear producto",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('productoCodigo', 'LAB1-' + pm.collectionVariables.get('sufijo'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('El producto fue creado', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('productoId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1\",\n  \"descripcion\": \"Producto de demostracion del Laboratorio 1\",\n  \"precioVenta\": 75.50,\n  \"existencia\": 20,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/productos"
+          }
+        },
+        {
+          "name": "Listar productos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos"
+          }
+        },
+        {
+          "name": "Buscar producto por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        },
+        {
+          "name": "Actualizar producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1 actualizado\",\n  \"descripcion\": \"Producto actualizado desde Postman\",\n  \"precioVenta\": 80.00,\n  \"existencia\": 25,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        },
+        {
+          "name": "Listar productos por categoría",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/categoria/{{categoriaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Etiquetas y relación N:N",
+      "item": [
+        {
+          "name": "Crear etiqueta Oferta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Etiqueta Oferta creada', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('etiquetaOfertaId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Oferta-Lab1-{{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Crear etiqueta Importado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Etiqueta Importado creada', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('etiquetaImportadoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Importado-Lab1-{{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Crear etiqueta Empresarial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Etiqueta Empresarial creada', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('etiquetaEmpresarialId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empresarial-Lab1-{{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Crear etiqueta Portátil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Etiqueta Portátil creada', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('etiquetaPortatilId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Portatil-Lab1-{{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Crear etiqueta Gaming",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Etiqueta Gaming creada', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('etiquetaGamingId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Gaming-Lab1-{{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Listar etiquetas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/etiquetas"
+          }
+        },
+        {
+          "name": "Asociar Oferta al producto",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaOfertaId}}"
+          }
+        },
+        {
+          "name": "Asociar Gaming al producto",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaGamingId}}"
+          }
+        },
+        {
+          "name": "Consultar productos por etiqueta",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/etiqueta/{{etiquetaOfertaId}}"
+          }
+        },
+        {
+          "name": "Reto 1 - Quitar solo una asociación",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaGamingId}}"
+          }
+        },
+        {
+          "name": "Reto 2 - Verificar producto después de quitar asociación",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Eliminación final",
+      "item": [
+        {
+          "name": "Eliminar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('El producto fue eliminado', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

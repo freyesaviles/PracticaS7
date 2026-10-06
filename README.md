@@ -209,6 +209,18 @@ Resultado esperado: `204 No Content`.
 
 Para la entrega conviene tomar capturas de los GET, POST, PUT y DELETE, de la consulta por categoría, de la tabla `producto_etiqueta` en pgAdmin y de los dos retos finales.
 
+### Colección lista para importar
+
+También se incluye una colección automatizada en:
+
+```text
+postman/Laboratorio1.postman_collection.json
+```
+
+En Postman se debe seleccionar `Import`, elegir ese archivo y ejecutar las carpetas en orden. La colección guarda automáticamente los IDs de categoría, proveedor, producto y etiquetas. Usa nombres con el sufijo `Lab1` y la hora de ejecución para evitar choques con registros anteriores.
+
+La colección crea datos nuevos, prueba el CRUD, consulta por categoría, crea cinco etiquetas, prueba la relación muchos a muchos y ejecuta los dos retos finales. La eliminación del producto está separada en la última carpeta para que se pueda dejar como evidencia al final.
+
 ## Verificación rápida
 
 ```bash
