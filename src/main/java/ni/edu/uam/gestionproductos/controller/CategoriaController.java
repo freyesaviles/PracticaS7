@@ -1,6 +1,8 @@
-package ni.edu.uam.gestionproductos.producto;
+package ni.edu.uam.gestionproductos.controller;
 
 import jakarta.validation.Valid;
+import ni.edu.uam.gestionproductos.entity.Categoria;
+import ni.edu.uam.gestionproductos.service.CategoriaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,25 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productos")
-public class ProductoController {
+@RequestMapping("/api/categorias")
+public class CategoriaController {
 
-    private final ProductoRepository repository;
-    private final ProductoService service;
+    private final CategoriaService service;
 
-    public ProductoController(ProductoRepository repository, ProductoService service) {
-        this.repository = repository;
+    public CategoriaController(CategoriaService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<Producto> listar() {
-        return repository.findAll();
+    public List<Categoria> listar() {
+        return service.listar();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Producto guardar(@Valid @RequestBody Producto producto) {
-        return service.guardar(producto);
+    public Categoria guardar(@Valid @RequestBody Categoria categoria) {
+        return service.guardar(categoria);
     }
 }

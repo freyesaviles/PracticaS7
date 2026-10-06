@@ -1,4 +1,4 @@
-package ni.edu.uam.gestionproductos.producto;
+package ni.edu.uam.gestionproductos.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,8 +14,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import ni.edu.uam.gestionproductos.categoria.Categoria;
-import ni.edu.uam.gestionproductos.proveedor.Proveedor;
 
 import java.math.BigDecimal;
 
@@ -60,7 +58,7 @@ public class Producto {
     @Column(nullable = false)
     private Integer existencia = 0;
 
-    protected Producto() {
+    public Producto() {
     }
 
     public Integer getId() {

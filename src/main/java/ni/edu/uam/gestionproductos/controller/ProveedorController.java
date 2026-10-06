@@ -1,6 +1,8 @@
-package ni.edu.uam.gestionproductos.proveedor;
+package ni.edu.uam.gestionproductos.controller;
 
 import jakarta.validation.Valid;
+import ni.edu.uam.gestionproductos.entity.Proveedor;
+import ni.edu.uam.gestionproductos.service.ProveedorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,20 +17,20 @@ import java.util.List;
 @RequestMapping("/api/proveedores")
 public class ProveedorController {
 
-    private final ProveedorRepository repository;
+    private final ProveedorService service;
 
-    public ProveedorController(ProveedorRepository repository) {
-        this.repository = repository;
+    public ProveedorController(ProveedorService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Proveedor> listar() {
-        return repository.findAll();
+        return service.listar();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Proveedor guardar(@Valid @RequestBody Proveedor proveedor) {
-        return repository.save(proveedor);
+        return service.guardar(proveedor);
     }
 }

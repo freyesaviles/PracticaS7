@@ -1,4 +1,4 @@
-package ni.edu.uam.gestionproductos.proveedor;
+package ni.edu.uam.gestionproductos.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
