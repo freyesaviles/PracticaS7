@@ -7,6 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,6 +18,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "producto")
@@ -47,6 +51,14 @@ public class Producto {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "producto_etiqueta",
+            joinColumns = @JoinColumn(name = "producto_id"),
+            inverseJoinColumns = @JoinColumn(name = "etiqueta_id")
+    )
+    private Set<Etiqueta> etiquetas = new HashSet<>();
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = true)
@@ -107,6 +119,14 @@ public class Producto {
 
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
+    }
+
+    public Set<Etiqueta> getEtiquetas() {
+        return etiquetas;
+    }
+
+    public void setEtiquetas(Set<Etiqueta> etiquetas) {
+        this.etiquetas = etiquetas;
     }
 
     public BigDecimal getPrecioVenta() {

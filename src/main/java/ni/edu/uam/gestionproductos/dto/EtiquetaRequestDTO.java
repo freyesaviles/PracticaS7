@@ -1,0 +1,22 @@
+package ni.edu.uam.gestionproductos.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class EtiquetaRequestDTO {
+
+    @NotBlank
+    @Size(max = 100)
+    private String nombre;
+
+    public EtiquetaRequestDTO() {
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+}

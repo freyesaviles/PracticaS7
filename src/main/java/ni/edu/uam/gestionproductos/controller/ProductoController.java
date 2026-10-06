@@ -59,4 +59,21 @@ public class ProductoController {
     public List<Producto> listarPorCategoria(@PathVariable Integer categoriaId) {
         return productoService.listarPorCategoria(categoriaId);
     }
+
+    @PostMapping("/{productoId}/etiquetas/{etiquetaId}")
+    public Producto agregarEtiqueta(@PathVariable Integer productoId,
+                                    @PathVariable Integer etiquetaId) {
+        return productoService.agregarEtiqueta(productoId, etiquetaId);
+    }
+
+    @DeleteMapping("/{productoId}/etiquetas/{etiquetaId}")
+    public Producto eliminarEtiqueta(@PathVariable Integer productoId,
+                                     @PathVariable Integer etiquetaId) {
+        return productoService.eliminarEtiqueta(productoId, etiquetaId);
+    }
+
+    @GetMapping("/etiqueta/{etiquetaId}")
+    public List<Producto> listarPorEtiqueta(@PathVariable Integer etiquetaId) {
+        return productoService.listarPorEtiqueta(etiquetaId);
+    }
 }
