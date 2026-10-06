@@ -1,46 +1,46 @@
 {
   "info": {
     "_postman_id": "5d22c4a0-8b33-4a6f-9f5a-7f4f0b1c1a01",
-    "name": "Lab1 - Gestión de productos",
-    "description": "Colección para demostrar el Laboratorio 1: CRUD de productos, consultas por relación, migración V4 y relación Producto-Etiqueta.",
+    "name": "Lab1 - Gestión de productos (local)",
+    "description": "Colección local para demostrar el Laboratorio 1 completo. Ejecutar las carpetas en orden. Usa variables con prefijo lab1 para evitar conflictos con environments de Postman.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
-      "key": "baseUrl",
+      "key": "lab1BaseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "key": "categoriaId",
-      "value": ""
+      "key": "lab1CategoriaId",
+      "value": "2"
     },
     {
-      "key": "proveedorId",
-      "value": ""
+      "key": "lab1ProveedorId",
+      "value": "2"
     },
     {
-      "key": "productoId",
-      "value": ""
+      "key": "lab1ProductoId",
+      "value": "3"
     },
     {
-      "key": "etiquetaOfertaId",
-      "value": ""
+      "key": "lab1EtiquetaOfertaId",
+      "value": "3"
     },
     {
-      "key": "etiquetaImportadoId",
-      "value": ""
+      "key": "lab1EtiquetaImportadoId",
+      "value": "4"
     },
     {
-      "key": "etiquetaEmpresarialId",
-      "value": ""
+      "key": "lab1EtiquetaEmpresarialId",
+      "value": "5"
     },
     {
-      "key": "etiquetaPortatilId",
-      "value": ""
+      "key": "lab1EtiquetaPortatilId",
+      "value": "6"
     },
     {
-      "key": "etiquetaGamingId",
-      "value": ""
+      "key": "lab1EtiquetaGamingId",
+      "value": "7"
     }
   ],
   "item": [
@@ -67,7 +67,7 @@
                 "exec": [
                   "pm.test('La categoría fue creada', function () { pm.response.to.have.status(201); });",
                   "const body = pm.response.json();",
-                  "pm.collectionVariables.set('categoriaId', body.id);"
+                  "pm.collectionVariables.set('lab1CategoriaId', body.id);"
                 ]
               }
             }
@@ -89,7 +89,7 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/categorias"
+            "url": "{{lab1BaseUrl}}/api/categorias"
           }
         },
         {
@@ -111,7 +111,7 @@
                 "exec": [
                   "pm.test('El proveedor fue creado', function () { pm.response.to.have.status(201); });",
                   "const body = pm.response.json();",
-                  "pm.collectionVariables.set('proveedorId', body.id);"
+                  "pm.collectionVariables.set('lab1ProveedorId', body.id);"
                 ]
               }
             }
@@ -133,21 +133,21 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/proveedores"
+            "url": "{{lab1BaseUrl}}/api/proveedores"
           }
         },
         {
           "name": "Consultar categorías",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/categorias"
+            "url": "{{lab1BaseUrl}}/api/categorias"
           }
         },
         {
           "name": "Consultar proveedores",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/proveedores"
+            "url": "{{lab1BaseUrl}}/api/proveedores"
           }
         }
       ]
@@ -174,7 +174,7 @@
                 "exec": [
                   "pm.test('El producto fue creado', function () { pm.response.to.have.status(201); });",
                   "const body = pm.response.json();",
-                  "pm.collectionVariables.set('productoId', body.id);"
+                  "pm.collectionVariables.set('lab1ProductoId', body.id);"
                 ]
               }
             }
@@ -189,28 +189,28 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1\",\n  \"descripcion\": \"Producto de demostracion del Laboratorio 1\",\n  \"precioVenta\": 75.50,\n  \"existencia\": 20,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}",
+              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1\",\n  \"descripcion\": \"Producto de demostracion del Laboratorio 1\",\n  \"precioVenta\": 75.50,\n  \"existencia\": 20,\n  \"categoriaId\": {{lab1CategoriaId}},\n  \"proveedorId\": {{lab1ProveedorId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "url": "{{baseUrl}}/api/productos"
+            "url": "{{lab1BaseUrl}}/api/productos"
           }
         },
         {
           "name": "Listar productos",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/productos"
+            "url": "{{lab1BaseUrl}}/api/productos"
           }
         },
         {
           "name": "Buscar producto por ID",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}"
           }
         },
         {
@@ -225,21 +225,21 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1 actualizado\",\n  \"descripcion\": \"Producto actualizado desde Postman\",\n  \"precioVenta\": 80.00,\n  \"existencia\": 25,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}",
+              "raw": "{\n  \"codigo\": \"{{productoCodigo}}\",\n  \"nombre\": \"Teclado mecanico Lab1 actualizado\",\n  \"descripcion\": \"Producto actualizado desde Postman\",\n  \"precioVenta\": 80.00,\n  \"existencia\": 25,\n  \"categoriaId\": {{lab1CategoriaId}},\n  \"proveedorId\": {{lab1ProveedorId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}"
           }
         },
         {
           "name": "Listar productos por categoría",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/productos/categoria/{{categoriaId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/categoria/{{lab1CategoriaId}}"
           }
         }
       ]
@@ -256,7 +256,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Etiqueta Oferta creada', function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set('etiquetaOfertaId', pm.response.json().id);"
+                  "pm.collectionVariables.set('lab1EtiquetaOfertaId', pm.response.json().id);"
                 ]
               }
             }
@@ -278,7 +278,7 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
@@ -290,7 +290,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Etiqueta Importado creada', function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set('etiquetaImportadoId', pm.response.json().id);"
+                  "pm.collectionVariables.set('lab1EtiquetaImportadoId', pm.response.json().id);"
                 ]
               }
             }
@@ -312,7 +312,7 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
@@ -324,7 +324,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Etiqueta Empresarial creada', function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set('etiquetaEmpresarialId', pm.response.json().id);"
+                  "pm.collectionVariables.set('lab1EtiquetaEmpresarialId', pm.response.json().id);"
                 ]
               }
             }
@@ -346,7 +346,7 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
@@ -358,7 +358,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Etiqueta Portátil creada', function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set('etiquetaPortatilId', pm.response.json().id);"
+                  "pm.collectionVariables.set('lab1EtiquetaPortatilId', pm.response.json().id);"
                 ]
               }
             }
@@ -380,7 +380,7 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
@@ -392,7 +392,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Etiqueta Gaming creada', function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set('etiquetaGamingId', pm.response.json().id);"
+                  "pm.collectionVariables.set('lab1EtiquetaGamingId', pm.response.json().id);"
                 ]
               }
             }
@@ -414,49 +414,71 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
           "name": "Listar etiquetas",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/etiquetas"
+            "url": "{{lab1BaseUrl}}/api/etiquetas"
           }
         },
         {
           "name": "Asociar Oferta al producto",
           "request": {
             "method": "POST",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaOfertaId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}/etiquetas/{{lab1EtiquetaOfertaId}}"
           }
         },
         {
           "name": "Asociar Gaming al producto",
           "request": {
             "method": "POST",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaGamingId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}/etiquetas/{{lab1EtiquetaGamingId}}"
           }
         },
         {
           "name": "Consultar productos por etiqueta",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/productos/etiqueta/{{etiquetaOfertaId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/etiqueta/{{lab1EtiquetaOfertaId}}"
           }
         },
         {
           "name": "Reto 1 - Quitar solo una asociación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('La asociación fue eliminada', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaGamingId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}/etiquetas/{{lab1EtiquetaGamingId}}"
           }
         },
         {
-          "name": "Reto 2 - Verificar producto después de quitar asociación",
+          "name": "Reto 2 - Consultar productos por etiqueta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('La consulta por etiqueta funciona', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/etiqueta/{{lab1EtiquetaOfertaId}}"
           }
         }
       ]
@@ -479,7 +501,7 @@
           ],
           "request": {
             "method": "DELETE",
-            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+            "url": "{{lab1BaseUrl}}/api/productos/{{lab1ProductoId}}"
           }
         }
       ]
