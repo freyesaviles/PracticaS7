@@ -26,6 +26,8 @@ Cliente → Controller → Service → Repository → PostgreSQL
 
 Ahora el proyecto tiene los paquetes `controller`, `service`, `repository`, `entity` y `dto`. Además, se implementaron el CRUD completo de productos, la consulta por categoría, la relación bidireccional `Categoria 1:N Producto` y la relación `Producto N:N Etiqueta` mediante `producto_etiqueta`.
 
+En JPA, `Producto` conserva la referencia a `Categoria` porque el lado “muchos” es el que almacena la clave foránea `categoria_id`. La navegación de la API también está disponible desde la categoría mediante `GET /api/categorias/{categoriaId}/productos`.
+
 ## Estructura
 
 ```text
@@ -104,6 +106,7 @@ Se deben observar V1, V2, V3 y V4 con `success = true`.
 | PUT | `/api/productos/{id}` | Actualizar un producto |
 | DELETE | `/api/productos/{id}` | Eliminar un producto |
 | GET | `/api/productos/categoria/{categoriaId}` | Productos de una categoría |
+| GET | `/api/categorias/{categoriaId}/productos` | Productos navegados desde una categoría |
 | GET | `/api/etiquetas` | Listar etiquetas |
 | POST | `/api/etiquetas` | Crear una etiqueta |
 | POST | `/api/productos/{productoId}/etiquetas/{etiquetaId}` | Asociar una etiqueta |

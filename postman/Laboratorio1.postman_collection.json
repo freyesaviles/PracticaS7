@@ -149,6 +149,13 @@
             "method": "GET",
             "url": "{{lab1BaseUrl}}/api/proveedores"
           }
+        },
+        {
+          "name": "Consultar productos desde una categoría",
+          "request": {
+            "method": "GET",
+            "url": "{{lab1BaseUrl}}/api/categorias/{{lab1CategoriaId}}/productos"
+          }
         }
       ]
     },
