@@ -248,6 +248,13 @@
             "method": "GET",
             "url": "{{lab1BaseUrl}}/api/productos/categoria/{{lab1CategoriaId}}"
           }
+        },
+        {
+          "name": "Listar categorías con sus productos",
+          "request": {
+            "method": "GET",
+            "url": "{{lab1BaseUrl}}/api/categorias"
+          }
         }
       ]
     },

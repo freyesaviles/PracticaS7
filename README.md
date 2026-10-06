@@ -28,6 +28,25 @@ Ahora el proyecto tiene los paquetes `controller`, `service`, `repository`, `ent
 
 En JPA, `Producto` conserva la referencia a `Categoria` porque el lado “muchos” es el que almacena la clave foránea `categoria_id`. La navegación de la API también está disponible desde la categoría mediante `GET /api/categorias/{categoriaId}/productos`.
 
+Además, `GET /api/categorias` devuelve cada categoría con un resumen de sus productos:
+
+```json
+[
+  {
+    "id": 2,
+    "nombre": "Computadoras",
+    "activa": true,
+    "productos": [
+      {
+        "id": 3,
+        "codigo": "LAB1-001",
+        "nombre": "Teclado mecanico"
+      }
+    ]
+  }
+]
+```
+
 ## Estructura
 
 ```text

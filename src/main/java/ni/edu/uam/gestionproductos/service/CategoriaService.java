@@ -2,6 +2,7 @@ package ni.edu.uam.gestionproductos.service;
 
 import ni.edu.uam.gestionproductos.entity.Categoria;
 import ni.edu.uam.gestionproductos.entity.Producto;
+import ni.edu.uam.gestionproductos.dto.CategoriaConProductosDTO;
 import ni.edu.uam.gestionproductos.repository.CategoriaRepository;
 import ni.edu.uam.gestionproductos.repository.ProductoRepository;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,14 @@ public class CategoriaService {
     }
 
     public List<Categoria> listar() {
-        return repository.findAll();
+        return repository.findAllWithProductos();
+    }
+
+    public List<CategoriaConProductosDTO> listarConProductos() {
+        return repository.findAllWithProductos()
+                .stream()
+                .map(CategoriaConProductosDTO::new)
+                .toList();
     }
 
     public Categoria guardar(Categoria categoria) {

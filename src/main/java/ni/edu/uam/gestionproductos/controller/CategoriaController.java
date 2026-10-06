@@ -1,6 +1,7 @@
 package ni.edu.uam.gestionproductos.controller;
 
 import jakarta.validation.Valid;
+import ni.edu.uam.gestionproductos.dto.CategoriaConProductosDTO;
 import ni.edu.uam.gestionproductos.entity.Categoria;
 import ni.edu.uam.gestionproductos.entity.Producto;
 import ni.edu.uam.gestionproductos.service.CategoriaService;
@@ -26,8 +27,8 @@ public class CategoriaController {
     }
 
     @GetMapping
-    public List<Categoria> listar() {
-        return service.listar();
+    public List<CategoriaConProductosDTO> listar() {
+        return service.listarConProductos();
     }
 
     @GetMapping("/{categoriaId}/productos")
