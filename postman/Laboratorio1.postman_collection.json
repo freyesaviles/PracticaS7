@@ -12,19 +12,19 @@
     },
     {
       "key": "lab1CategoriaId",
-      "value": "2"
+      "value": "3"
     },
     {
       "key": "lab1ProveedorId",
-      "value": "2"
+      "value": "1"
     },
     {
       "key": "lab1ProductoId",
-      "value": "3"
+      "value": "8"
     },
     {
       "key": "lab1EtiquetaOfertaId",
-      "value": "3"
+      "value": "1"
     },
     {
       "key": "lab1EtiquetaImportadoId",
@@ -40,7 +40,7 @@
     },
     {
       "key": "lab1EtiquetaGamingId",
-      "value": "7"
+      "value": "2"
     }
   ],
   "item": [

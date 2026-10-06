@@ -246,22 +246,14 @@ La colección crea datos nuevos, prueba el CRUD, consulta por categoría, crea c
 En la base local actual ya se ejecutó el flujo de preparación. La colección quedó con estos IDs precargados:
 
 ```text
-categoriaId: 2       proveedorId: 2       productoId: 3
-etiquetaOfertaId: 3  etiquetaImportadoId: 4  etiquetaEmpresarialId: 5
-etiquetaPortatilId: 6  etiquetaGamingId: 7
+categoriaId: 3       proveedorId: 1       productoId: 8
+etiquetaOfertaId: 1  etiquetaImportadoId: 4  etiquetaEmpresarialId: 5
+etiquetaPortatilId: 6  etiquetaGamingId: 2
 ```
 
-Por eso, para la demostración actual solo hay que iniciar la API y ejecutar `Reto 1 - Quitar solo una asociación` y `Reto 2 - Consultar productos por etiqueta`. Si la base de datos se recrea o se eliminan esos registros, hay que volver a ejecutar las carpetas de preparación.
+Para la demostración actual se debe importar esta única colección y ejecutar las carpetas en orden. Si la base de datos se recrea o se eliminan esos registros, hay que volver a ejecutar las carpetas de preparación.
 
-Para demostrar únicamente los retos sin depender de variables de Postman, también existe una colección local ya preparada:
-
-```text
-postman/Laboratorio1-Retos-Preparados.postman_collection.json
-```
-
-Esta colección usa directamente los datos locales actuales: producto `3`, etiqueta Oferta `3` y etiqueta Gaming `7`. Importarla y ejecutar sus dos solicitudes en orden.
-
-Si una URL aparece terminando en `/categoria/`, `/etiquetas/` o `/productos/`, significa que una variable de Postman quedó vacía. En ese caso hay que volver a importar la colección actualizada. La colección completa usa variables con prefijo `lab1` para no mezclarse con environments anteriores; la preparación actual corresponde a categoría `2`, producto `3` y etiqueta Gaming `7`.
+Si una URL aparece terminando en `/categoria/`, `/etiquetas/` o `/productos/`, significa que una variable de Postman quedó vacía. En ese caso hay que volver a importar la colección actualizada. La colección completa usa variables con prefijo `lab1` para no mezclarse con environments anteriores; la preparación actual corresponde a categoría `3`, producto `8` y etiqueta Gaming `2`.
 
 ## Verificación rápida
 
