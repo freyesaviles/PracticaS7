@@ -1,160 +1,227 @@
 # Gestión de productos
 
-API REST de la práctica guiada de la semana 7 de Servicios Web. El proyecto utiliza Spring Boot, Spring Data JPA, Hibernate, PostgreSQL y Flyway.
+API REST desarrollada para las prácticas guiadas de Servicios Web. El proyecto usa Spring Boot, Spring Data JPA, Hibernate, PostgreSQL y Flyway.
 
-## Requisitos
+## Laboratorio 1: continuación de la práctica de la semana 7
+
+### ¿Qué problema había en la semana 7?
+
+La API de la semana 7 funcionaba, pero todavía estaba incompleta para crecer de forma ordenada:
+
+- `ProductoController` accedía directamente al repositorio para listar productos.
+- El servicio solo cubría el guardado.
+- Faltaban el DTO, el CRUD completo y la consulta por categoría.
+- La relación `Categoria–Producto` no tenía el lado `@OneToMany`.
+- No existían etiquetas ni la relación muchos a muchos.
+
+No era un error que impidiera arrancar la aplicación; era una oportunidad de mejorar la arquitectura y completar las funcionalidades solicitadas en el Laboratorio 1.
+
+### ¿Cómo se arregló?
+
+Se separaron las responsabilidades así:
+
+```text
+Cliente → Controller → Service → Repository → PostgreSQL
+```
+
+Ahora el proyecto tiene los paquetes `controller`, `service`, `repository`, `entity` y `dto`. Además, se implementaron el CRUD completo de productos, la consulta por categoría, la relación bidireccional `Categoria 1:N Producto` y la relación `Producto N:N Etiqueta` mediante `producto_etiqueta`.
+
+## Estructura
+
+```text
+src/main/java/ni/edu/uam/gestionproductos/
+├── controller/
+├── dto/
+├── entity/
+├── repository/
+└── service/
+```
+
+## Requisitos y configuración
 
 - Java 21 o superior.
-- Maven 3.9 o superior, o Maven Wrapper desde IntelliJ IDEA.
 - PostgreSQL 15 o superior.
+- Maven 3.9 o Maven Wrapper.
 
-## Configuración de PostgreSQL en macOS
-
-En este equipo se detectó PostgreSQL 17 instalado mediante Homebrew. Para iniciarlo:
+En macOS, si PostgreSQL fue instalado con Homebrew:
 
 ```bash
 brew services start postgresql@17
 ```
 
-Para detenerlo:
-
-```bash
-brew services stop postgresql@17
-```
-
 La aplicación usa por defecto:
 
-| Variable | Valor predeterminado |
-|---|---|
-| `DB_URL` | `jdbc:postgresql://localhost:5432/gestion_productos` |
-| `DB_USERNAME` | `postgres` |
-| `DB_PASSWORD` | `postgres` |
+```text
+URL:      jdbc:postgresql://localhost:5432/gestion_productos
+Usuario:  postgres
+Clave:    postgres
+```
 
-Las variables de entorno permiten usar otras credenciales sin modificar el código.
-
-## Crear la base de datos
+Crear la base de datos una sola vez:
 
 ```sql
 CREATE DATABASE gestion_productos;
 ```
 
-Las tablas se crean automáticamente mediante las migraciones de Flyway. No se deben crear manualmente.
-
-## Ejecutar
+Luego iniciar la API:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-También se puede ejecutar desde IntelliJ IDEA iniciando `GestionProductosApplication`.
+También se puede ejecutar `GestionProductosApplication` desde IntelliJ IDEA.
 
 ## Migraciones
 
-Una migración es un cambio versionado en la estructura de la base de datos. Flyway ejecuta cada archivo una sola vez y registra el resultado en `flyway_schema_history`. El prefijo `V1`, `V2` y `V3` indica el orden en que se aplican.
+Flyway actualiza la base de datos automáticamente al iniciar la aplicación. Cada migración se ejecuta una sola vez y queda registrada en `flyway_schema_history`.
 
-| Migración | Cambio realizado | Evidencia que puede revisar el profesor |
-|---|---|---|
-| `V1__crear_tablas.sql` | Crea `categoria`, `producto` y la FK `producto.categoria_id`. | Tablas `categoria` y `producto`, además de la relación entre ambas. |
-| `V2__agregar_descripcion_producto.sql` | Agrega la columna `producto.descripcion`. | Columna `descripcion` en la tabla y atributo equivalente en la entidad `Producto`. |
-| `V3__crear_proveedores_y_relacionar_productos.sql` | Crea `proveedor`, agrega `producto.proveedor_id` y su FK. | Tabla `proveedor` y relación `Proveedor 1:N Producto`. |
+| Versión | Qué agrega |
+|---|---|
+| V1 | Tablas `categoria` y `producto`. |
+| V2 | Columna `producto.descripcion`. |
+| V3 | Tabla `proveedor` y relación con `producto`. |
+| V4 | Tablas `etiqueta` y `producto_etiqueta`. |
 
-`spring.jpa.hibernate.ddl-auto=validate` hace que Hibernate valide el esquema existente, mientras Flyway administra sus cambios.
+Hibernate usa `ddl-auto=validate`, por lo que valida que las entidades coincidan con la base de datos, pero no crea ni modifica tablas por su cuenta.
 
-### ¿Qué se debe validar?
-
-Hay dos validaciones distintas:
-
-1. **Validación de Flyway:** al iniciar la aplicación deben ejecutarse V1, V2 y V3 sin errores. La tabla `flyway_schema_history` debe mostrar las tres migraciones con `success = true`.
-2. **Validación de Hibernate:** `ddl-auto=validate` compara las entidades Java con las tablas existentes. Si falta una tabla, columna, tipo o relación esperada, la aplicación no inicia. Hibernate no crea ni modifica tablas en esta configuración.
-
-También se valida el funcionamiento de la API mediante Postman:
-
-- `GET /api/categorias` responde `200`.
-- Los `POST` de categorías y proveedores responden `201`.
-- `POST /api/productos` guarda el producto usando IDs existentes de categoría y proveedor.
-- `GET /api/productos` muestra las relaciones guardadas.
-
-### Comandos de comprobación
-
-Después de iniciar la aplicación, se pueden usar estas consultas:
+Para revisar el historial desde pgAdmin o `psql`:
 
 ```sql
 SELECT installed_rank, version, description, success
 FROM flyway_schema_history
 ORDER BY installed_rank;
-
-SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'public'
-  AND table_name IN ('categoria', 'producto', 'proveedor')
-ORDER BY table_name;
-
-SELECT table_name, column_name
-FROM information_schema.columns
-WHERE table_schema = 'public'
-  AND table_name IN ('categoria', 'producto', 'proveedor')
-ORDER BY table_name, ordinal_position;
 ```
 
-La primera consulta debe mostrar las versiones `1`, `2` y `3`, todas exitosas. La segunda debe mostrar las tres tablas. La tercera permite comprobar las columnas creadas por cada migración.
+Se deben observar V1, V2, V3 y V4 con `success = true`.
 
-### Correspondencia con el historial de Git
+## Endpoints del Laboratorio 1
 
-Los cambios se separaron en commits para que el avance sea visible:
+| Método | Ruta | Uso |
+|---|---|---|
+| GET | `/api/productos` | Listar productos |
+| GET | `/api/productos/{id}` | Buscar un producto |
+| POST | `/api/productos` | Crear un producto |
+| PUT | `/api/productos/{id}` | Actualizar un producto |
+| DELETE | `/api/productos/{id}` | Eliminar un producto |
+| GET | `/api/productos/categoria/{categoriaId}` | Productos de una categoría |
+| GET | `/api/etiquetas` | Listar etiquetas |
+| POST | `/api/etiquetas` | Crear una etiqueta |
+| POST | `/api/productos/{productoId}/etiquetas/{etiquetaId}` | Asociar una etiqueta |
+| DELETE | `/api/productos/{productoId}/etiquetas/{etiquetaId}` | Quitar solo la asociación |
+| GET | `/api/productos/etiqueta/{etiquetaId}` | Productos de una etiqueta |
 
-- `Agregar migración inicial y gestión de categorías`: V1 y entidad `Categoria`.
-- `Implementar productos y migración de descripción`: V2, entidad `Producto` y su endpoint.
-- `Agregar proveedores y relación con productos`: V3, entidad `Proveedor` y relación con `Producto`.
-- `Documentar validación y ejecución de migraciones`: explicación de las comprobaciones y evidencias.
+También se mantienen los endpoints de categorías y proveedores de la práctica anterior.
 
-Para validar el proyecto completo:
+## Cómo probarlo en Postman
+
+Usar `http://localhost:8080` como base URL. Los IDs son ejemplos; hay que reemplazarlos por los que devuelva la API.
+
+### 1. Obtener IDs existentes
+
+```text
+GET /api/categorias
+GET /api/proveedores
+```
+
+Se necesita una categoría y, si se utiliza, un proveedor existente.
+
+### 2. Crear un producto
+
+```text
+POST /api/productos
+Content-Type: application/json
+```
+
+```json
+{
+  "codigo": "LAB1-001",
+  "nombre": "Teclado mecanico",
+  "descripcion": "Producto de prueba del Laboratorio 1",
+  "precioVenta": 75.50,
+  "existencia": 20,
+  "categoriaId": 1,
+  "proveedorId": 1
+}
+```
+
+Guardar el `id` que devuelva la respuesta.
+
+### 3. Probar el CRUD y la consulta por categoría
+
+```text
+GET    /api/productos
+GET    /api/productos/{productoId}
+PUT    /api/productos/{productoId}
+GET    /api/productos/categoria/{categoriaId}
+```
+
+Para el `PUT` se puede usar el mismo JSON del `POST`, cambiando algún dato, por ejemplo el precio o la existencia. El `DELETE /api/productos/{productoId}` conviene dejarlo para el final porque elimina el producto.
+
+### 4. Crear las etiquetas
+
+Crear al menos estas cinco mediante `POST /api/etiquetas`:
+
+```text
+Oferta
+Importado
+Empresarial
+Portátil
+Gaming
+```
+
+Ejemplo del cuerpo:
+
+```json
+{
+  "nombre": "Oferta"
+}
+```
+
+### 5. Probar la relación muchos a muchos
+
+Para cada etiqueta que se quiera asociar:
+
+```text
+POST /api/productos/{productoId}/etiquetas/{etiquetaId}
+```
+
+Después comprobar:
+
+```text
+GET /api/productos/etiqueta/{etiquetaId}
+```
+
+### 6. Probar los retos finales
+
+Eliminar solo una asociación:
+
+```text
+DELETE /api/productos/{productoId}/etiquetas/{etiquetaId}
+```
+
+Luego verificar que el producto y la etiqueta siguen existiendo. Finalmente se puede probar:
+
+```text
+DELETE /api/productos/{productoId}
+```
+
+Resultado esperado: `204 No Content`.
+
+Para la entrega conviene tomar capturas de los GET, POST, PUT y DELETE, de la consulta por categoría, de la tabla `producto_etiqueta` en pgAdmin y de los dos retos finales.
+
+## Verificación rápida
 
 ```bash
 ./mvnw test
 ./mvnw package -DskipTests
 ```
 
-## Endpoints principales
+La aplicación fue probada contra PostgreSQL local. Flyway aplicó V4 correctamente y se verificaron el CRUD, las consultas por categoría, las etiquetas y las asociaciones.
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/categorias` | Lista categorías |
-| `POST` | `/api/categorias` | Crea una categoría |
-| `GET` | `/api/productos` | Lista productos |
-| `POST` | `/api/productos` | Crea un producto relacionado |
-| `GET` | `/api/proveedores` | Lista proveedores |
-| `POST` | `/api/proveedores` | Crea un proveedor |
+## Commits del Laboratorio 1
 
-Ejemplo de categoría:
+Los cambios de esta actividad están identificados con el prefijo `Lab1:`:
 
-```json
-{
-  "nombre": "Computadoras",
-  "activa": true
-}
-```
-
-Ejemplo de proveedor:
-
-```json
-{
-  "nombre": "Distribuidora Centroamericana",
-  "telefono": "2255-0101",
-  "correo": "ventas@distribuidora.example",
-  "activo": true
-}
-```
-
-Ejemplo de producto. Se debe usar un ID real de categoría y proveedor existentes:
-
-```json
-{
-  "codigo": "LAP-001",
-  "nombre": "Laptop Lenovo",
-  "descripcion": "Laptop para trabajo y estudio",
-  "categoria": { "id": 1 },
-  "proveedor": { "id": 1 },
-  "precioVenta": 850.00,
-  "existencia": 10
-}
-```
+- `Lab1: Reorganizar arquitectura por capas y completar CRUD de productos`
+- `Lab1: Agregar migración V4 y relación muchos a muchos`
+- `Lab1: Documentar problema, pruebas y solución del Laboratorio 1`
