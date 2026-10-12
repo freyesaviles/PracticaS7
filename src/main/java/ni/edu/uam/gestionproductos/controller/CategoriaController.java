@@ -7,8 +7,10 @@ import ni.edu.uam.gestionproductos.entity.Producto;
 import ni.edu.uam.gestionproductos.service.CategoriaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,6 +33,11 @@ public class CategoriaController {
         return service.listarConProductos();
     }
 
+    @GetMapping("/{categoriaId}")
+    public CategoriaConProductosDTO buscar(@PathVariable Integer categoriaId) {
+        return service.buscarPorId(categoriaId);
+    }
+
     @GetMapping("/{categoriaId}/productos")
     public List<Producto> listarProductos(@PathVariable Integer categoriaId) {
         return service.listarProductos(categoriaId);
@@ -40,5 +47,17 @@ public class CategoriaController {
     @ResponseStatus(HttpStatus.CREATED)
     public Categoria guardar(@Valid @RequestBody Categoria categoria) {
         return service.guardar(categoria);
+    }
+
+    @PutMapping("/{categoriaId}")
+    public Categoria actualizar(@PathVariable Integer categoriaId,
+                                @Valid @RequestBody Categoria categoria) {
+        return service.actualizar(categoriaId, categoria);
+    }
+
+    @DeleteMapping("/{categoriaId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Integer categoriaId) {
+        service.eliminar(categoriaId);
     }
 }

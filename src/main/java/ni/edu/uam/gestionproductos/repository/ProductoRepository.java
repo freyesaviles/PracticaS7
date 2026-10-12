@@ -9,5 +9,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     List<Producto> findByCategoria_Id(Integer categoriaId);
 
+    boolean existsByCategoria_Id(Integer categoriaId);
+
     List<Producto> findDistinctByEtiquetas_Id(Integer etiquetaId);
 }
