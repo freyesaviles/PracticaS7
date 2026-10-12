@@ -1,0 +1,269 @@
+{
+  "info": {
+    "_postman_id": "7b5f7e4e-8f3d-4f7e-9c86-7c7c86d94f91",
+    "name": "Practica 9 - Seguridad JWT",
+    "description": "Colección general para probar autenticación JWT, roles USER y ADMIN, CRUD protegido de productos y categorías, y relaciones de etiquetas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "lab9BaseUrl", "value": "http://localhost:8080" },
+    { "key": "lab9AdminToken", "value": "" },
+    { "key": "lab9UserToken", "value": "" },
+    { "key": "lab9CategoriaId", "value": "" },
+    { "key": "lab9CategoriaRetoId", "value": "" },
+    { "key": "lab9ProveedorId", "value": "" },
+    { "key": "lab9ProductoId", "value": "" },
+    { "key": "lab9EtiquetaId", "value": "" },
+    { "key": "lab9ProductoCodigo", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Acceso público y autenticación",
+      "item": [
+        {
+          "name": "Saludo público sin token",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": "{{lab9BaseUrl}}/api/publico/saludo"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('El saludo público responde 200', function () { pm.response.to.have.status(200); });"
+              ] }
+            }
+          ]
+        },
+        {
+          "name": "Login ADMIN",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('El login ADMIN responde 200', function () { pm.response.to.have.status(200); });",
+                "pm.collectionVariables.set('lab9AdminToken', pm.response.json().token);"
+              ] }
+            }
+          ]
+        },
+        {
+          "name": "Login USER",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"operador\",\n  \"password\": \"Operador123!\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('El login USER responde 200', function () { pm.response.to.have.status(200); });",
+                "pm.collectionVariables.set('lab9UserToken', pm.response.json().token);"
+              ] }
+            }
+          ]
+        },
+        {
+          "name": "Login inválido",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"incorrecta\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('El login inválido responde 401', function () { pm.response.to.have.status(401); });"
+              ] }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Preparar datos con ADMIN",
+      "item": [
+        {
+          "name": "Crear categoría",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría Seguridad Lab9\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/categorias"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('ADMIN puede crear categorías', function () { pm.response.to.have.status(201); });",
+                "pm.collectionVariables.set('lab9CategoriaId', pm.response.json().id);",
+                "pm.collectionVariables.set('lab9CategoriaRetoId', pm.response.json().id);"
+              ] }
+            }
+          ]
+        },
+        {
+          "name": "Crear proveedor",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Proveedor Seguridad Lab9\",\n  \"telefono\": \"2255-0199\",\n  \"correo\": \"lab9@example.com\",\n  \"activo\": true\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/proveedores"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('ADMIN puede crear proveedores', function () { pm.response.to.have.status(201); });",
+                "pm.collectionVariables.set('lab9ProveedorId', pm.response.json().id);"
+              ] }
+            }
+          ]
+        },
+        {
+          "name": "Crear producto",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB9-001\",\n  \"nombre\": \"Producto protegido\",\n  \"descripcion\": \"Producto creado por ADMIN\",\n  \"precioVenta\": 100.00,\n  \"existencia\": 10,\n  \"categoriaId\": {{lab9CategoriaId}},\n  \"proveedorId\": {{lab9ProveedorId}}\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/productos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": [
+                "pm.test('ADMIN puede crear productos', function () { pm.response.to.have.status(201); });",
+                "pm.collectionVariables.set('lab9ProductoId', pm.response.json().id);",
+                "pm.collectionVariables.set('lab9ProductoCodigo', pm.response.json().codigo);"
+              ] }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Productos y permisos",
+      "item": [
+        {
+          "name": "Consultar productos sin token",
+          "request": { "method": "GET", "auth": { "type": "noauth" }, "url": "{{lab9BaseUrl}}/api/productos" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Sin token responde 401', function () { pm.response.to.have.status(401); });"] } }]
+        },
+        {
+          "name": "Consultar productos como USER",
+          "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER puede consultar productos', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Modificar producto como USER",
+          "request": {
+            "method": "PUT",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"{{lab9ProductoCodigo}}\",\n  \"nombre\": \"Intento USER\",\n  \"descripcion\": \"No debe permitirse\",\n  \"precioVenta\": 1.00,\n  \"existencia\": 1,\n  \"categoriaId\": {{lab9CategoriaId}},\n  \"proveedorId\": {{lab9ProveedorId}}\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/productos/{{lab9ProductoId}}"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER no puede modificar productos', function () { pm.response.to.have.status(403); });"] } }]
+        },
+        {
+          "name": "Actualizar producto como ADMIN",
+          "request": {
+            "method": "PUT",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"{{lab9ProductoCodigo}}\",\n  \"nombre\": \"Producto actualizado por ADMIN\",\n  \"descripcion\": \"Actualización autorizada\",\n  \"precioVenta\": 110.00,\n  \"existencia\": 12,\n  \"categoriaId\": {{lab9CategoriaId}},\n  \"proveedorId\": {{lab9ProveedorId}}\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/productos/{{lab9ProductoId}}"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede actualizar productos', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Consultar productos con token alterado",
+          "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "token-modificado", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('El token alterado responde 401', function () { pm.response.to.have.status(401); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "4. Categorías y reto final",
+      "item": [
+        {
+          "name": "Consultar categorías como USER",
+          "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/categorias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER puede consultar categorías', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Consultar productos desde categoría como USER",
+          "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/categorias/{{lab9CategoriaId}}/productos" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER puede navegar categoría a productos', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Crear categoría como USER",
+          "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría no autorizada\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/categorias" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER no puede crear categorías', function () { pm.response.to.have.status(403); });"] } }]
+        },
+        {
+          "name": "Actualizar categoría como USER",
+          "request": { "method": "PUT", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Cambio no autorizado\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/categorias/{{lab9CategoriaId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER no puede actualizar categorías', function () { pm.response.to.have.status(403); });"] } }]
+        },
+        {
+          "name": "Actualizar categoría como ADMIN",
+          "request": { "method": "PUT", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría actualizada por ADMIN\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/categorias/{{lab9CategoriaId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede actualizar categorías', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Eliminar categoría creada para el reto como ADMIN",
+          "request": { "method": "DELETE", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/categorias/{{lab9CategoriaRetoId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede eliminar categorías sin productos', function () { pm.response.to.have.status(204); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "5. Etiquetas y limpieza",
+      "item": [
+        {
+          "name": "Crear etiqueta como ADMIN",
+          "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Seguridad Lab9\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/etiquetas" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede crear etiquetas', function () { pm.response.to.have.status(201); });", "pm.collectionVariables.set('lab9EtiquetaId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "Asociar etiqueta como ADMIN",
+          "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos/{{lab9ProductoId}}/etiquetas/{{lab9EtiquetaId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede asociar etiquetas', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Consultar productos por etiqueta como USER",
+          "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9UserToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos/etiqueta/{{lab9EtiquetaId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('USER puede consultar por etiqueta', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Eliminar asociación como ADMIN",
+          "request": { "method": "DELETE", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos/{{lab9ProductoId}}/etiquetas/{{lab9EtiquetaId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede eliminar la asociación', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Eliminar producto como ADMIN",
+          "request": { "method": "DELETE", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "url": "{{lab9BaseUrl}}/api/productos/{{lab9ProductoId}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede eliminar productos', function () { pm.response.to.have.status(204); });"] } }]
+        }
+      ]
+    }
+  ]
+}

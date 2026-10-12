@@ -1,90 +1,90 @@
 # Gestión de productos
 
-API REST desarrollada para las prácticas guiadas de Servicios Web. El proyecto usa Spring Boot, Spring Data JPA, Hibernate, PostgreSQL y Flyway.
+API REST de Servicios Web con Spring Boot, Spring Data JPA, PostgreSQL, Flyway y Spring Security.
 
-## Laboratorio 1: continuación de la práctica de la semana 7
+## Práctica 9: Seguridad con JWT
 
-### ¿Qué problema había en la semana 7?
+La práctica agrega autenticación y autorización al CRUD existente. Antes, cualquier cliente podía modificar productos y categorías. Ahora el acceso depende del rol del usuario.
 
-La API de la semana 7 funcionaba, pero todavía estaba incompleta para crecer de forma ordenada:
+### Roles
 
-- `ProductoController` accedía directamente al repositorio para listar productos.
-- El servicio solo cubría el guardado.
-- Faltaban el DTO, el CRUD completo y la consulta por categoría.
-- La relación `Categoria–Producto` no tenía el lado `@OneToMany`.
-- No existían etiquetas ni la relación muchos a muchos.
+| Rol | Permisos |
+|---|---|
+| Invitado | Saludo público y login |
+| USER | Consultar productos y categorías |
+| ADMIN | Consultar y modificar productos y categorías |
 
-No era un error que impidiera arrancar la aplicación; era una oportunidad de mejorar la arquitectura y completar las funcionalidades solicitadas en el Laboratorio 1.
-
-### ¿Cómo se arregló?
-
-Se separaron las responsabilidades así:
+Usuarios de laboratorio (solo desarrollo):
 
 ```text
-Cliente → Controller → Service → Repository → PostgreSQL
+admin     / Admin123!
+operador  / Operador123!
 ```
 
-Ahora el proyecto tiene los paquetes `controller`, `service`, `repository`, `entity` y `dto`. Además, se implementaron el CRUD completo de productos, la consulta por categoría, la relación bidireccional `Categoria 1:N Producto` y la relación `Producto N:N Etiqueta` mediante `producto_etiqueta`.
+Los usuarios están en memoria; no se guardan en PostgreSQL.
 
-En JPA, `Producto` conserva la referencia a `Categoria` porque el lado “muchos” es el que almacena la clave foránea `categoria_id`. La navegación de la API también está disponible desde la categoría mediante `GET /api/categorias/{categoriaId}/productos`.
+## Qué se implementó
 
-Además, `GET /api/categorias` devuelve cada categoría con un resumen de sus productos:
+- Login con JWT firmado mediante HS256.
+- Tokens stateless con duración de 30 minutos.
+- Validación de firma, vencimiento y roles.
+- Productos: lectura para `USER` y `ADMIN`; escritura solo para `ADMIN`.
+- Categorías: lectura para `USER` y `ADMIN`; creación, actualización y eliminación solo para `ADMIN`.
+- Proveedores y etiquetas: lectura para ambos roles; cambios para `ADMIN`.
+- Endpoint público: `GET /api/publico/saludo`.
+- Reto categoría-productos: `GET /api/categorias` devuelve cada categoría con sus productos resumidos.
 
-```json
-[
-  {
-    "id": 2,
-    "nombre": "Computadoras",
-    "activa": true,
-    "productos": [
-      {
-        "id": 3,
-        "codigo": "LAB1-001",
-        "nombre": "Teclado mecanico"
-      }
-    ]
-  }
-]
-```
-
-## Estructura
+La relación JPA sigue siendo `Categoria 1:N Producto`. `Producto` conserva la referencia a `Categoria` porque el lado “muchos” almacena la clave foránea `categoria_id`. La API permite navegar desde categoría:
 
 ```text
-src/main/java/ni/edu/uam/gestionproductos/
-├── controller/
-├── dto/
-├── entity/
-├── repository/
-└── service/
+GET /api/categorias/{categoriaId}/productos
 ```
 
-## Requisitos y configuración
+## Configurar el secreto JWT
 
-- Java 21 o superior.
-- PostgreSQL 15 o superior.
-- Maven 3.9 o Maven Wrapper.
+No se debe guardar el secreto en GitHub. Generar uno localmente:
 
-En macOS, si PostgreSQL fue instalado con Homebrew:
+```bash
+openssl rand -base64 32
+```
+
+Agregar el resultado como variable de entorno en la configuración de ejecución de IntelliJ IDEA:
+
+```text
+JWT_SECRET_BASE64=valor_generado_localmente
+```
+
+La aplicación exige una clave de al menos 32 bytes. Si falta, no inicia.
+
+## PostgreSQL
+
+Valores locales predeterminados:
+
+```text
+Host:       localhost
+Puerto:     5432
+Base:       gestion_productos
+Usuario:    postgres
+Contraseña: postgres
+```
+
+En macOS con Homebrew:
 
 ```bash
 brew services start postgresql@17
 ```
 
-La aplicación usa por defecto:
+La base usa Flyway. Las migraciones V1–V4 crean las tablas y relaciones de categorías, productos, proveedores y etiquetas. Hibernate usa `ddl-auto=validate` para revisar el esquema sin modificarlo.
 
-```text
-URL:      jdbc:postgresql://localhost:5432/gestion_productos
-Usuario:  postgres
-Clave:    postgres
+## Ejecutar
+
+Cambiar a la rama de la práctica:
+
+```bash
+git switch seguridad-jwt
 ```
 
-Crear la base de datos una sola vez:
-
-```sql
-CREATE DATABASE gestion_productos;
-```
-
-Luego iniciar la API:
+Iniciar la aplicación:
 
 ```bash
 ./mvnw spring-boot:run
@@ -92,168 +92,41 @@ Luego iniciar la API:
 
 También se puede ejecutar `GestionProductosApplication` desde IntelliJ IDEA.
 
-## Migraciones
+## Probar con Postman
 
-Flyway actualiza la base de datos automáticamente al iniciar la aplicación. Cada migración se ejecuta una sola vez y queda registrada en `flyway_schema_history`.
-
-| Versión | Qué agrega |
-|---|---|
-| V1 | Tablas `categoria` y `producto`. |
-| V2 | Columna `producto.descripcion`. |
-| V3 | Tabla `proveedor` y relación con `producto`. |
-| V4 | Tablas `etiqueta` y `producto_etiqueta`. |
-
-Hibernate usa `ddl-auto=validate`, por lo que valida que las entidades coincidan con la base de datos, pero no crea ni modifica tablas por su cuenta.
-
-Para revisar el historial desde pgAdmin o `psql`:
-
-```sql
-SELECT installed_rank, version, description, success
-FROM flyway_schema_history
-ORDER BY installed_rank;
-```
-
-Se deben observar V1, V2, V3 y V4 con `success = true`.
-
-## Endpoints del Laboratorio 1
-
-| Método | Ruta | Uso |
-|---|---|---|
-| GET | `/api/productos` | Listar productos |
-| GET | `/api/productos/{id}` | Buscar un producto |
-| POST | `/api/productos` | Crear un producto |
-| PUT | `/api/productos/{id}` | Actualizar un producto |
-| DELETE | `/api/productos/{id}` | Eliminar un producto |
-| GET | `/api/productos/categoria/{categoriaId}` | Productos de una categoría |
-| GET | `/api/categorias/{categoriaId}/productos` | Productos navegados desde una categoría |
-| GET | `/api/etiquetas` | Listar etiquetas |
-| POST | `/api/etiquetas` | Crear una etiqueta |
-| POST | `/api/productos/{productoId}/etiquetas/{etiquetaId}` | Asociar una etiqueta |
-| DELETE | `/api/productos/{productoId}/etiquetas/{etiquetaId}` | Quitar solo la asociación |
-| GET | `/api/productos/etiqueta/{etiquetaId}` | Productos de una etiqueta |
-
-También se mantienen los endpoints de categorías y proveedores de la práctica anterior.
-
-## Cómo probarlo en Postman
-
-Usar `http://localhost:8080` como base URL. Los IDs son ejemplos; hay que reemplazarlos por los que devuelva la API.
-
-### 1. Obtener IDs existentes
+La colección general está en:
 
 ```text
-GET /api/categorias
-GET /api/proveedores
+postman/Practica9-Seguridad-JWT.postman_collection.json
 ```
 
-Se necesita una categoría y, si se utiliza, un proveedor existente.
+Importarla en Postman y ejecutar las carpetas en orden:
 
-### 2. Crear un producto
+1. **Acceso público y autenticación:** saludo, login ADMIN, login USER y login inválido.
+2. **Preparar datos con ADMIN:** crea una categoría, un proveedor y un producto.
+3. **Productos y permisos:** comprueba `401`, lectura con USER, `403` al modificar con USER y actualización con ADMIN.
+4. **Categorías y reto final:** comprueba consultas con USER y modificaciones con USER/ADMIN.
+5. **Etiquetas y limpieza:** prueba la relación muchos a muchos y elimina los datos creados para la demostración.
 
-```text
-POST /api/productos
-Content-Type: application/json
-```
+Los scripts de Postman guardan automáticamente los tokens y los IDs en variables de colección. Si se ejecuta una solicitud protegida antes del login correspondiente, se obtendrá `401`.
 
-```json
-{
-  "codigo": "LAB1-001",
-  "nombre": "Teclado mecanico",
-  "descripcion": "Producto de prueba del Laboratorio 1",
-  "precioVenta": 75.50,
-  "existencia": 20,
-  "categoriaId": 1,
-  "proveedorId": 1
-}
-```
+### Resultados esperados
 
-Guardar el `id` que devuelva la respuesta.
+| Prueba | Resultado |
+|---|---:|
+| Saludo público sin token | `200` |
+| Login válido | `200` con JWT |
+| Login inválido | `401` |
+| Producto sin token | `401` |
+| Consulta de producto con USER | `200` |
+| Modificación con USER | `403` |
+| Modificación con ADMIN | `200`, `201` o `204` |
+| Token alterado | `401` |
+| Consulta de categoría con USER | `200` |
+| Modificación de categoría con USER | `403` |
+| Modificación de categoría con ADMIN | `200`, `201` o `204` |
 
-### 3. Probar el CRUD y la consulta por categoría
-
-```text
-GET    /api/productos
-GET    /api/productos/{productoId}
-PUT    /api/productos/{productoId}
-GET    /api/productos/categoria/{categoriaId}
-```
-
-Para el `PUT` se puede usar el mismo JSON del `POST`, cambiando algún dato, por ejemplo el precio o la existencia. El `DELETE /api/productos/{productoId}` conviene dejarlo para el final porque elimina el producto.
-
-### 4. Crear las etiquetas
-
-Crear al menos estas cinco mediante `POST /api/etiquetas`:
-
-```text
-Oferta
-Importado
-Empresarial
-Portátil
-Gaming
-```
-
-Ejemplo del cuerpo:
-
-```json
-{
-  "nombre": "Oferta"
-}
-```
-
-### 5. Probar la relación muchos a muchos
-
-Para cada etiqueta que se quiera asociar:
-
-```text
-POST /api/productos/{productoId}/etiquetas/{etiquetaId}
-```
-
-Después comprobar:
-
-```text
-GET /api/productos/etiqueta/{etiquetaId}
-```
-
-### 6. Probar los retos finales
-
-Eliminar solo una asociación:
-
-```text
-DELETE /api/productos/{productoId}/etiquetas/{etiquetaId}
-```
-
-Luego verificar que el producto y la etiqueta siguen existiendo. Finalmente se puede probar:
-
-```text
-DELETE /api/productos/{productoId}
-```
-
-Resultado esperado: `204 No Content`.
-
-Para la entrega conviene tomar capturas de los GET, POST, PUT y DELETE, de la consulta por categoría, de la tabla `producto_etiqueta` en pgAdmin y de los dos retos finales.
-
-### Colección lista para importar
-
-También se incluye una colección automatizada en:
-
-```text
-postman/Laboratorio1.postman_collection.json
-```
-
-En Postman se debe seleccionar `Import`, elegir ese archivo y ejecutar las carpetas en orden. La colección guarda automáticamente los IDs de categoría, proveedor, producto y etiquetas. Usa nombres con el sufijo `Lab1` y la hora de ejecución para evitar choques con registros anteriores.
-
-La colección crea datos nuevos, prueba el CRUD, consulta por categoría, crea cinco etiquetas, prueba la relación muchos a muchos y ejecuta los dos retos finales. La eliminación del producto está separada en la última carpeta para que se pueda dejar como evidencia al final.
-
-En la base local actual ya se ejecutó el flujo de preparación. La colección quedó con estos IDs precargados:
-
-```text
-categoriaId: 3       proveedorId: 1       productoId: 8
-etiquetaOfertaId: 1  etiquetaImportadoId: 4  etiquetaEmpresarialId: 5
-etiquetaPortatilId: 6  etiquetaGamingId: 2
-```
-
-Para la demostración actual se debe importar esta única colección y ejecutar las carpetas en orden. Si la base de datos se recrea o se eliminan esos registros, hay que volver a ejecutar las carpetas de preparación.
-
-Si una URL aparece terminando en `/categoria/`, `/etiquetas/` o `/productos/`, significa que una variable de Postman quedó vacía. En ese caso hay que volver a importar la colección actualizada. La colección completa usa variables con prefijo `lab1` para no mezclarse con environments anteriores; la preparación actual corresponde a categoría `3`, producto `8` y etiqueta Gaming `2`.
+`401` significa que falta autenticación o el token no es válido. `403` significa que el token sí es válido, pero el rol no tiene permiso.
 
 ## Verificación rápida
 
@@ -262,12 +135,21 @@ Si una URL aparece terminando en `/categoria/`, `/etiquetas/` o `/productos/`, s
 ./mvnw package -DskipTests
 ```
 
-La aplicación fue probada contra PostgreSQL local. Flyway aplicó V4 correctamente y se verificaron el CRUD, las consultas por categoría, las etiquetas y las asociaciones.
+También se debe comprobar que PostgreSQL esté activo y que Flyway muestre V1, V2, V3 y V4 con `success = true`:
 
-## Commits del Laboratorio 1
+```sql
+SELECT version, description, success
+FROM flyway_schema_history
+ORDER BY installed_rank;
+```
 
-Los cambios de esta actividad están identificados con el prefijo `Lab1:`:
+## Seguridad
 
-- `Lab1: Reorganizar arquitectura por capas y completar CRUD de productos`
-- `Lab1: Agregar migración V4 y relación muchos a muchos`
-- `Lab1: Documentar problema, pruebas y solución del Laboratorio 1`
+No subir a GitHub:
+
+- `JWT_SECRET_BASE64`.
+- Tokens JWT.
+- Contraseñas reales.
+- Archivos `.env` con secretos.
+
+La configuración incluida es para laboratorio. En producción se necesitarían HTTPS, un gestor de secretos y normalmente un proveedor de identidad separado.
