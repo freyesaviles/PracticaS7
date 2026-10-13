@@ -103,7 +103,7 @@
             "method": "POST",
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría Seguridad Lab9\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } },
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría Seguridad Lab9 {{$timestamp}}\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{lab9BaseUrl}}/api/categorias"
           },
           "event": [
@@ -111,8 +111,7 @@
               "listen": "test",
               "script": { "type": "text/javascript", "exec": [
                 "pm.test('ADMIN puede crear categorías', function () { pm.response.to.have.status(201); });",
-                "pm.collectionVariables.set('lab9CategoriaId', pm.response.json().id);",
-                "pm.collectionVariables.set('lab9CategoriaRetoId', pm.response.json().id);"
+                "pm.collectionVariables.set('lab9CategoriaId', pm.response.json().id);"
               ] }
             }
           ]
@@ -123,7 +122,7 @@
             "method": "POST",
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Proveedor Seguridad Lab9\",\n  \"telefono\": \"2255-0199\",\n  \"correo\": \"lab9@example.com\",\n  \"activo\": true\n}", "options": { "raw": { "language": "json" } } },
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Proveedor Seguridad Lab9 {{$timestamp}}\",\n  \"telefono\": \"2255-0199\",\n  \"correo\": \"lab9-{{$timestamp}}@example.com\",\n  \"activo\": true\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{lab9BaseUrl}}/api/proveedores"
           },
           "event": [
@@ -142,7 +141,7 @@
             "method": "POST",
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB9-001\",\n  \"nombre\": \"Producto protegido\",\n  \"descripcion\": \"Producto creado por ADMIN\",\n  \"precioVenta\": 100.00,\n  \"existencia\": 10,\n  \"categoriaId\": {{lab9CategoriaId}},\n  \"proveedorId\": {{lab9ProveedorId}}\n}", "options": { "raw": { "language": "json" } } },
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB9-{{$timestamp}}\",\n  \"nombre\": \"Producto protegido\",\n  \"descripcion\": \"Producto creado por ADMIN\",\n  \"precioVenta\": 100.00,\n  \"existencia\": 10,\n  \"categoriaId\": {{lab9CategoriaId}},\n  \"proveedorId\": {{lab9ProveedorId}}\n}", "options": { "raw": { "language": "json" } } },
             "url": "{{lab9BaseUrl}}/api/productos"
           },
           "event": [
@@ -155,6 +154,20 @@
               ] }
             }
           ]
+        },
+        {
+          "name": "Crear categoría vacía para probar DELETE",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Categoría vacía Lab9 {{$timestamp}}\",\n  \"activa\": true\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{lab9BaseUrl}}/api/categorias"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Se creó la categoría vacía para el reto', function () { pm.response.to.have.status(201); });",
+            "pm.collectionVariables.set('lab9CategoriaRetoId', pm.response.json().id);"
+          ] } }]
         }
       ]
     },
@@ -240,7 +253,7 @@
       "item": [
         {
           "name": "Crear etiqueta como ADMIN",
-          "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Seguridad Lab9\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/etiquetas" },
+          "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{lab9AdminToken}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Seguridad-Lab9-{{$timestamp}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{lab9BaseUrl}}/api/etiquetas" },
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('ADMIN puede crear etiquetas', function () { pm.response.to.have.status(201); });", "pm.collectionVariables.set('lab9EtiquetaId', pm.response.json().id);"] } }]
         },
         {
