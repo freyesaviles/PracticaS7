@@ -31,6 +31,7 @@ Los usuarios están en memoria; no se guardan en PostgreSQL.
 - Productos: lectura para `USER` y `ADMIN`; escritura solo para `ADMIN`.
 - Categorías: lectura para `USER` y `ADMIN`; creación, actualización y eliminación solo para `ADMIN`.
 - Proveedores y etiquetas: lectura para ambos roles; cambios para `ADMIN`.
+- Proveedores reciben los datos de creación mediante `ProveedorRequestDTO`, con validación de nombre, correo y teléfono.
 - Endpoint público: `GET /api/publico/saludo`.
 - Reto categoría-productos: `GET /api/categorias` devuelve cada categoría con sus productos resumidos.
 

@@ -1,5 +1,6 @@
 package ni.edu.uam.gestionproductos.service;
 
+import ni.edu.uam.gestionproductos.dto.ProveedorRequestDTO;
 import ni.edu.uam.gestionproductos.entity.Proveedor;
 import ni.edu.uam.gestionproductos.repository.ProveedorRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,11 @@ public class ProveedorService {
         return repository.findAll();
     }
 
-    public Proveedor guardar(Proveedor proveedor) {
+    public Proveedor guardar(ProveedorRequestDTO dto) {
+        Proveedor proveedor = new Proveedor(
+                dto.getNombre(),
+                dto.getTelefono(),
+                dto.getCorreo());
         return repository.save(proveedor);
     }
 }
